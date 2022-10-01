@@ -31,6 +31,24 @@ def next(prev, curr):
   st.session_state[curr] = True
   st.experimental_rerun()
 
+def predict_stutter():
+  stuttered_phonemes = [] # predicted stuttered phonemes
+  stuttered_phonemes_maps = {}
+  for phoneme in stuttered_phonemes:
+    stuttered_phonemes_maps[phonemes] = 1
+  words = SAMPLE_PARAGRAPH.split()
+  processed_words = []
+  for word in words:
+    phonemes = [] # transform word to phonemes
+    for phoneme in phonemes:
+      if stuttered_phonemes[phoneme] == 1:
+        processed_words.append("<u>" + word + "</u>")
+        break
+    else:
+      processed_words.append(word)
+  return (" ").join(processed_words)
+    
+
 SAMPLE_PARAGRAPH = """
 \"Simply put, a paragraph is a collection of sentences all related to a central topic, idea, or theme. Paragraphs act as structural tools for writers to organize their thoughts into an ideal progression, and they also help readers process those thoughts effortlessly. Imagine how much harder reading and writing would be if everything was just one long block of text.\"  
 \- __Grammarly - What is a paragraph?__ 
@@ -58,7 +76,18 @@ if 'practice_expended' not in st.session_state:
 if 'result_expended' not in st.session_state:
   st.session_state.result_expended = False
 
-# intro
+if 'stuttered_text' not in st.session_state:
+  st.session_state.stuttered_text = SAMPLE_PARAGRAPH
+
+st.write("""
+<style>
+u {
+  color: red
+}
+</style>
+""", unsafe_allow_html=True)
+
+# hero
 with st.container():
   col1, col2 = st.columns(2)
   with col1:
@@ -73,6 +102,9 @@ with st.container():
     st.title("Lionel Logue")
     st.text("2022 AI powered speech therapist")
     # st.caption("AI powered speech therapist")
+# Task: Intro (maybe use card)
+st.text("-Alan, Henry, Willy")
+st.write("Lionel Logue is a AI powered digital speech therapist that helps stutterer becomes better at speaking.")
 
 # step 1
 with st.container():
@@ -81,6 +113,7 @@ with st.container():
   )
   with read:
     st.title("Read 📖")
+    st.markdown("In this section, please read the following paragraph so that we can compile which <u>phonemes</u> you struggle to pronounce.", unsafe_allow_html=True)
     st.write(SAMPLE_PARAGRAPH)
     read_clicked = st.button("Start Recording",
       key = "read-button"
@@ -89,6 +122,7 @@ with st.container():
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
       record()
+      # task: predict_stutter()
       next("read_expended", "analyze_expended")
 
 # step 2
@@ -98,6 +132,10 @@ with st.container():
   )
   with read:
     st.title("Analyze 📋")
+    st.write("Words you stuttered on:")
+    st.markdown(st.session_state.stuttered_text, unsafe_allow_html=True) # Task: underline words stuttered on
+    st.write("Phonemes you stuttered on:")
+    st.text("[uh, so, m]") # Task: show phonemes
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -111,6 +149,7 @@ with st.container():
   )
   with read:
     st.title("Practice 🎙")
+    st.write("We generated a sentense based on the phonemes you most often stuttered on. Practice using the following sentence to help you from stuttering!")
     practice_clicked = st.button("Next",
       key = "practice-button"
     )
