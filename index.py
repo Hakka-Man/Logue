@@ -8,6 +8,8 @@ from multiprocessing import Process
 import requests
 from streamlit_lottie import st_lottie
 
+import phodel
+
 def load_lottieurl(url):
   request = requests.get(url)
   if request.status_code != 200:
@@ -121,6 +123,8 @@ with st.container():
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
       record()
+      t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
+      phoenemes = phodel.getPhonemes(t, t_s)
       # task: predict_stutter()
       next("read_expended", "analyze_expended")
 
