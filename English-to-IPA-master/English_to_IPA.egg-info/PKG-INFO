@@ -2,7 +2,10 @@ Metadata-Version: 2.1
 Name: English-to-IPA
 Version: 0.2.1
 Summary: take English text and convert it to IPA
+Home-page: UNKNOWN
 Author: ['mphilli', 'Mitchellpkt', 'CanadianCommander', 'timvancann']
+License: UNKNOWN
+Platform: UNKNOWN
 License-File: LICENSE
 
 
@@ -99,3 +102,5 @@ syllable counts if more than one word is provided in the input string.
 ### Other Resources
 
 For another Python package that offers support for rhyming and syllable counts (as well as other cool things), see [pronouncingpy](https://github.com/aparrish/pronouncingpy).
+
+
