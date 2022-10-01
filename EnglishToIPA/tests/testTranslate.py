@@ -1,2 +1,2 @@
 import eng_to_ipa as ipa
-print(ipa.convert("Hello, my name is Henry."))
+print(ipa.convert("Simply put, a paragraph is a collection of sentences all related to a central topic, idea, or theme. Paragraphs act as structural tools for writers to organize their thoughts into an ideal progression, and they also help readers process those thoughts effortlessly"))
