@@ -5,15 +5,14 @@ import scipy as sc
 import soundfile as sf
 import numpy as np
 from multiprocessing import Process
+import requests
+from streamlit_lottie import st_lottie
 
-SAMPLE_PARAGRAPH = """
-\"Simply put, a paragraph is a collection of sentences all related to a central topic, idea, or theme. Paragraphs act as structural tools for writers to organize their thoughts into an ideal progression, and they also help readers process those thoughts effortlessly. Imagine how much harder reading and writing would be if everything was just one long block of text.\"  
-\- __Grammarly - What is a paragraph?__ 
-"""
-
-# time user has to read the sample paragraph
-SAMPLE_TIME = 2
-
+def load_lottieurl(url):
+  request = requests.get(url)
+  if request.status_code != 200:
+    return None
+  return request.json()
 
 def record():
   print("record started")
@@ -36,6 +35,16 @@ def next():
   st.session_state.show_stutter_expended = False
   st.experimental_rerun()
 
+SAMPLE_PARAGRAPH = """
+\"Simply put, a paragraph is a collection of sentences all related to a central topic, idea, or theme. Paragraphs act as structural tools for writers to organize their thoughts into an ideal progression, and they also help readers process those thoughts effortlessly. Imagine how much harder reading and writing would be if everything was just one long block of text.\"  
+\- __Grammarly - What is a paragraph?__ 
+"""
+
+# time user has to read the sample paragraph
+SAMPLE_TIME = 2
+
+book_animation = load_lottieurl("https://assets7.lottiefiles.com/packages/lf20_4XmSkB.json")
+
 # def count_down(second):
 #   for i in range(second, 0, -1):
 #     print(i)
@@ -46,6 +55,23 @@ if 'read_expended' not in st.session_state:
 if 'show_stutter_expended' not in st.session_state:
   st.session_state.show_stutter_expended = False
 
+# intro
+with st.container():
+  col1, col2 = st.columns(2)
+  with col1:
+    st_lottie(book_animation)
+  with col2:
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.title("Lionel Logue")
+    st.text("2022 AI powered speech therapist")
+    # st.caption("AI powered speech therapist")
+
+# step 1
 with st.container():
   read = st.expander("Step 1.",
     expanded = st.session_state.read_expended
@@ -58,6 +84,7 @@ with st.container():
       # optinal task: can add countdown feature on button
       record()
 
+# step 2
 with st.container():
   read = st.expander("Step 2.",
     expanded = st.session_state.show_stutter_expended
@@ -68,3 +95,7 @@ with st.container():
     if next_clicked:
       # add countdown
       next()
+
+# Footer
+with st.container():
+  st.caption("Animation made by [Alessio Ciancio](https://lottiefiles.com/alessiociancio) from www.lottiefiles.com")
