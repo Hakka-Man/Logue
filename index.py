@@ -26,13 +26,9 @@ def record():
   sf.write('output.flac', data, fs)
   print("record ended")
 
-  # set session expended values
-  st.session_state.read_expended = False
-  st.session_state.show_stutter_expended = True
-  st.experimental_rerun()
-
-def next():
-  st.session_state.show_stutter_expended = False
+def next(prev, curr):
+  st.session_state[prev] = False
+  st.session_state[curr] = True
   st.experimental_rerun()
 
 SAMPLE_PARAGRAPH = """
@@ -49,11 +45,18 @@ book_animation = load_lottieurl("https://assets7.lottiefiles.com/packages/lf20_4
 #   for i in range(second, 0, -1):
 #     print(i)
 
+# initialize state variables
 if 'read_expended' not in st.session_state:
   st.session_state.read_expended = True
 
-if 'show_stutter_expended' not in st.session_state:
-  st.session_state.show_stutter_expended = False
+if 'analyze_expended' not in st.session_state:
+  st.session_state.analyze_expended = False
+
+if 'practice_expended' not in st.session_state:
+  st.session_state.practice_expended = False
+
+if 'result_expended' not in st.session_state:
+  st.session_state.result_expended = False
 
 # intro
 with st.container():
@@ -79,22 +82,48 @@ with st.container():
   with read:
     st.title("Read 📖")
     st.write(SAMPLE_PARAGRAPH)
-    record_clicked = st.button("Start Recording")
-    if record_clicked:
-      # optinal task: can add countdown feature on button
+    read_clicked = st.button("Start Recording",
+      key = "read-button"
+    )
+    if read_clicked:
+      # optional task: can add countdown feature on button
+      # optional task: allow user to download the recorded audio
       record()
+      next("read_expended", "analyze_expended")
 
 # step 2
 with st.container():
   read = st.expander("Step 2.",
-    expanded = st.session_state.show_stutter_expended
+    expanded = st.session_state.analyze_expended
   )
   with read:
-    st.title("Read 📖")
-    next_clicked = st.button("Next")
-    if next_clicked:
-      # add countdown
-      next()
+    st.title("Analyze 📋")
+    analyze_clicked = st.button("Next",
+      key = "analyze-button"
+    )
+    if analyze_clicked:
+      next("analyze_expended", "practice_expended")
+
+# step 3
+with st.container():
+  read = st.expander("Step 3.",
+    expanded = st.session_state.practice_expended
+  )
+  with read:
+    st.title("Practice 🎙")
+    practice_clicked = st.button("Next",
+      key = "practice-button"
+    )
+    if practice_clicked:
+      next("practice_expended", "result_expended")
+  
+# result
+with st.container():
+  read = st.expander("Result",
+    expanded = st.session_state.result_expended
+  )
+  with read:
+    st.title("Result 🤗")
 
 # Footer
 with st.container():
