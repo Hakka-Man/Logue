@@ -78,7 +78,7 @@ def predict_stutter():
   words = SAMPLE_PARAGRAPH.split()
   processed_words = []
   for word in words:
-    phonemes = ipa(word)
+    phonemes = ipa.convert(word)
     for phoneme in phonemes:
       if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
@@ -217,5 +217,5 @@ with st.container():
     st.title("Result 🤗")
 
 # Footer
-with st.container():
-  st.caption("Animation made by [Alessio Ciancio](https://lottiefiles.com/alessiociancio) from www.lottiefiles.com")
+# with st.container():
+#   st.caption("Animation made by [Alessio Ciancio](https://lottiefiles.com/alessiociancio) from www.lottiefiles.com")
