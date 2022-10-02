@@ -7,8 +7,19 @@ import numpy as np
 from multiprocessing import Process
 import requests
 from streamlit_lottie import st_lottie
-
+import pickle
+import random
 import phodel
+
+with (open("NER/labeledParagraphs.pickle", "rb")) as openfile:
+  labeledParagraphs = pickle.load(openfile)
+
+with (open("NER/modifiableWords.pickle", "rb")) as openfile:
+  modifiableWords = pickle.load(openfile)
+
+with (open("NER/wordPosPhonemeDict.pickle", "rb")) as openfile:
+  wordPosPhonemeDict = pickle.load(openfile)
+
 
 def load_lottieurl(url):
   request = requests.get(url)
@@ -33,6 +44,30 @@ def next(prev, curr):
   st.session_state[curr] = True
   st.experimental_rerun()
 
+def substitute_paragraph(phoenemes):
+  paragraph = labeledParagraphs[random.randint(0,4)]
+  paragraph_text = ""
+  index = 0
+  for word in paragraph:
+    if word[1] == "PUNCT":
+      paragraph_text = paragraph_text[0: -1]
+    if word[1] in modifiableWords:
+      i = index
+      for j in range(len(phoenemes)):
+        if (word[1], phoenemes[i]) in wordPosPhonemeDict.keys():
+          possibleWords = wordPosPhonemeDict[(word[1], phoenemes[i])]
+          paragraph_text += possibleWords[random.randint(0, len(possibleWords) - 1)]
+          paragraph_text += " "
+          index = (index + 1) % len(phoenemes)
+          break
+        i = (i + 1) % len(phoenemes)
+      else:
+        paragraph_text += (word[0] + " ")
+    else:
+      paragraph_text += (word[0] + " ")
+  return paragraph_text
+      
+
 def predict_stutter():
   stuttered_phonemes = [] # predicted stuttered phonemes
   stuttered_phonemes_maps = {}
@@ -56,7 +91,7 @@ SAMPLE_PARAGRAPH = """
 """
 
 # time user has to read the sample paragraph
-SAMPLE_TIME = 2
+SAMPLE_TIME = 60
 
 book_animation = load_lottieurl("https://assets7.lottiefiles.com/packages/lf20_4XmSkB.json")
 
@@ -79,6 +114,12 @@ if 'result_expended' not in st.session_state:
 
 if 'stuttered_text' not in st.session_state:
   st.session_state.stuttered_text = SAMPLE_PARAGRAPH
+
+if 'phoenemes' not in st.session_state:
+  st.session_state.phoenemes = []
+
+if 'paragraph' not in st.session_state:
+  st.session_state.paragraph = []
 
 st.write("""
 <style>
@@ -122,9 +163,15 @@ with st.container():
     if read_clicked:
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
-      record()
+      # record()
       t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
       phoenemes = phodel.getPhonemes(t, t_s)
+      print(phoenemes)
+      st.session_state.phoenemes = phoenemes
+      paragraph = substitute_paragraph(phoenemes)
+      st.session_state.paragraph = paragraph
+      print(paragraph)
+
       # task: predict_stutter()
       next("read_expended", "analyze_expended")
 
@@ -138,7 +185,7 @@ with st.container():
     st.write("Words you stuttered on:")
     st.markdown(st.session_state.stuttered_text, unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
-    st.text("[uh, so, m]") # Task: show phonemes
+    st.text(st.session_state.phoenemes) # Task: show phonemes
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -166,6 +213,7 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
+    st.write(st.session_state.paragraph)
 
 # Footer
 with st.container():
