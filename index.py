@@ -10,6 +10,7 @@ from streamlit_lottie import st_lottie
 import pickle
 import random
 import phodel
+import eng_to_ipa as ipa
 
 with (open("NER/labeledParagraphs.pickle", "rb")) as openfile:
   labeledParagraphs = pickle.load(openfile)
@@ -70,16 +71,16 @@ def substitute_paragraph(phoenemes):
       
 
 def predict_stutter():
-  stuttered_phonemes = [] # predicted stuttered phonemes
+  stuttered_phonemes = st.session_state.phoenemes
   stuttered_phonemes_maps = {}
   for phoneme in stuttered_phonemes:
     stuttered_phonemes_maps[phonemes] = 1
   words = SAMPLE_PARAGRAPH.split()
   processed_words = []
   for word in words:
-    phonemes = [] # transform word to phonemes
+    phonemes = ipa(word)
     for phoneme in phonemes:
-      if stuttered_phonemes[phoneme] == 1:
+      if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
         break
     else:
@@ -184,7 +185,7 @@ with st.container():
   with read:
     st.title("Analyze 📋")
     st.write("Words you stuttered on:")
-    st.markdown(st.session_state.stuttered_text, unsafe_allow_html=True) # Task: underline words stuttered on
+    st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes) # Task: show phonemes
     analyze_clicked = st.button("Next",

@@ -24,6 +24,7 @@ def getTranscription(originalText):
 def getPhonemes(trans, trans_s):
     searched = set()
     searched.add(" ")
+    fluencyScore = 0
     stutterPhonemes = []
     for phoneme in trans[0]:
         if phoneme not in searched:
@@ -31,7 +32,10 @@ def getPhonemes(trans, trans_s):
             og = trans[0].count(phoneme)
             vc = trans_s[0].count(phoneme)
             score = float(vc) / float(og)
-            print(score)
             if score > 1.5:
                 stutterPhonemes.append(phoneme)
-    return stutterPhonemes
+                fluencyScore += 1
+                if score > 2:
+                    fluencyScore += 1
+    fluencyScore = (len(searched)  - fluencyScore) / len(searched)
+    return stutterPhonemes, fluencyScore
