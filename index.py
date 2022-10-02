@@ -170,7 +170,7 @@ with st.container():
   )
   with read:
     st.title("Read 📖")
-    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready.", unsafe_allow_html=True)
+    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready. Click 'Stop' when you finish talking. Click 'Reset' if you want to start over. Click 'Download' if you want to hear what you said. Finally, click 'Submit' button to sumbit your sound file to our slutter phonemes detector.", unsafe_allow_html=True)
     st.markdown("<strong>" + SAMPLE_PARAGRAPH + "</strong>", unsafe_allow_html=True)
     # optional task: can add countdown feature on button
     # optional task: allow user to download the recorded audio
@@ -190,7 +190,7 @@ with st.container():
       st.session_state.finish_record = True
 
     if st.session_state.finish_record:
-      read_clicked = st.button("Next",
+      read_clicked = st.button("Submit",
         key = "next-button"
       )
       if read_clicked:
@@ -220,6 +220,7 @@ with st.container():
     st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes[0]) # Task: show phonemes
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + st.session_state.phoenemes[1])
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -233,7 +234,7 @@ with st.container():
   )
   with read:
     st.title("Practice 🎙")
-    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. You can do it!")
+    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. Click 'Stop' when you finish talking. Click 'Reset' if you want to start over. Click 'Download' if you want to hear what you said. Finally, click 'Submit' button to sumbit your sound file to our slutter phonemes detector. You can do it!")
     st.markdown("<strong>" + st.session_state.paragraph + "</strong>", unsafe_allow_html=True)
     practice_clicked = st.button("Next",
       key = "practice-button"
@@ -248,6 +249,8 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + st.session_state.phoenemes[1])
+
 
 # Footer
 # with st.container():
