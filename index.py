@@ -253,5 +253,5 @@ with st.container():
     st.title("Result 🤗")
 
 # Footer
-with st.container():
-  st.caption("Animation made by [Alessio Ciancio](https://lottiefiles.com/alessiociancio) from www.lottiefiles.com")
+# with st.container():
+#   st.caption("Animation made by [Alessio Ciancio](https://lottiefiles.com/alessiociancio) from www.lottiefiles.com")
