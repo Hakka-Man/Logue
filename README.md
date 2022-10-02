@@ -38,4 +38,6 @@ After figuring out the weaknesses of the user, we would show that information to
 
 # Screenshots
 ![Start](https://i.ibb.co/sFX1sd3/Screen-Shot-2022-10-02-at-10-46-44641.png)
+![Read](https://i.ibb.co/svpGQxC/Screen-Shot-2022-10-02-at-10-47-08764.png)
+![Analyze](https://i.ibb.co/1XDKMg4/Screen-Shot-2022-10-02-at-10-48-57367.png)
 
