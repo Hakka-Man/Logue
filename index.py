@@ -73,13 +73,11 @@ def substitute_paragraph(phoenemes):
 def predict_stutter():
   stuttered_phonemes = st.session_state.phoenemes
   stuttered_phonemes_maps = {}
-  for phoneme in stuttered_phonemes:
-    stuttered_phonemes_maps[phonemes] = 1
   words = SAMPLE_PARAGRAPH.split()
   processed_words = []
   for word in words:
-    phonemes = ipa.convert(word)
-    for phoneme in phonemes:
+    phonemesOfWord = ipa.convert(word)
+    for phoneme in phonemesOfWord:
       if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
         break
