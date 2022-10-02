@@ -10,6 +10,15 @@ from streamlit_lottie import st_lottie
 import pickle
 import random
 import phodel
+import os
+from io import BytesIO
+import io
+import streamlit.components.v1 as components
+import ffmpeg
+
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+build_dir = os.path.join(parent_dir, "st_audiorec")
+st_audiorec = components.declare_component("st_audiorec", path=build_dir)
 
 with (open("NER/labeledParagraphs.pickle", "rb")) as openfile:
   labeledParagraphs = pickle.load(openfile)
@@ -122,6 +131,12 @@ if 'phoenemes' not in st.session_state:
 if 'paragraph' not in st.session_state:
   st.session_state.paragraph = []
 
+if 'finish_record' not in st.session_state:
+  st.session_state.finish_record = False
+
+if 'start_loading' not in st.session_state:
+  st.session_state.start_loading = False
+
 st.write("""
 <style>
 u {
@@ -158,23 +173,42 @@ with st.container():
     st.title("Read 📖")
     st.markdown("In this section, please read the following paragraph so that we can compile which <u>phonemes</u> you struggle to pronounce.", unsafe_allow_html=True)
     st.write(SAMPLE_PARAGRAPH)
-    read_clicked = st.button("Start Recording",
-      key = "read-button"
-    )
-    if read_clicked:
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
       # record()
-      t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
-      phoenemes = phodel.getPhonemes(t, t_s)
-      print(phoenemes)
-      st.session_state.phoenemes = phoenemes
-      paragraph = substitute_paragraph(phoenemes)
-      st.session_state.paragraph = paragraph
-      print(paragraph)
+    val = st_audiorec()
+    if isinstance(val, dict):
+      with st.spinner('retrieving audio-recording...'):
+        ind, val = zip(*val['arr'].items())
+        ind = np.array(ind, dtype=int)
+        val = np.array(val)
+        sorted_ints = val[ind]
+        stream = BytesIO(b"".join([int(v).to_bytes(1, "big") for v in sorted_ints]))
+        wav_bytes = stream.read()
+      # st.audio(wav_bytes, format='audio/wav')
+      data, samplerate = sf.read(io.BytesIO(wav_bytes))
+      sf.write('stereo.flac', data, samplerate)
+      st.session_state.finish_record = True
 
+    if st.session_state.finish_record:
+      read_clicked = st.button("Next",
+        key = "next-button"
+      )
+      if read_clicked:
+        st.session_state.start_loading = True
+        if st.session_state.start_loading:
+          st.caption("loading...")
+        ffmpeg.input('stereo.flac').output('output.flac', ac=1).run(overwrite_output=True)
+        t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
+        phoenemes = phodel.getPhonemes(t, t_s)
+        print(phoenemes)
+        st.session_state.phoenemes = phoenemes
+        paragraph = substitute_paragraph(phoenemes)
+        st.session_state.paragraph = paragraph
+        print(paragraph)
+        st.session_state.start_loading = False
       # task: predict_stutter()
-      next("read_expended", "analyze_expended")
+        next("read_expended", "analyze_expended")
 
 # step 2
 with st.container():
