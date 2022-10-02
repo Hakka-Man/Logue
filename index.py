@@ -19,6 +19,7 @@ import ffmpeg
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 build_dir = os.path.join(parent_dir, "st_audiorec")
 st_audiorec = components.declare_component("st_audiorec", path=build_dir)
+import eng_to_ipa as ipa
 
 with (open("NER/labeledParagraphs.pickle", "rb")) as openfile:
   labeledParagraphs = pickle.load(openfile)
@@ -79,16 +80,14 @@ def substitute_paragraph(phoenemes):
       
 
 def predict_stutter():
-  stuttered_phonemes = [] # predicted stuttered phonemes
+  stuttered_phonemes = st.session_state.phoenemes
   stuttered_phonemes_maps = {}
-  for phoneme in stuttered_phonemes:
-    stuttered_phonemes_maps[phonemes] = 1
   words = SAMPLE_PARAGRAPH.split()
   processed_words = []
   for word in words:
-    phonemes = [] # transform word to phonemes
-    for phoneme in phonemes:
-      if stuttered_phonemes[phoneme] == 1:
+    phonemesOfWord = ipa.convert(word)
+    for phoneme in phonemesOfWord:
+      if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
         break
     else:
@@ -129,7 +128,7 @@ if 'phoenemes' not in st.session_state:
   st.session_state.phoenemes = []
 
 if 'paragraph' not in st.session_state:
-  st.session_state.paragraph = []
+  st.session_state.paragraph = ""
 
 if 'finish_record' not in st.session_state:
   st.session_state.finish_record = False
@@ -157,12 +156,11 @@ with st.container():
     st.write("")
     st.write("")
     st.write("")
-    st.title("Lionel Logue")
-    st.text("2022 AI powered speech therapist")
-    # st.caption("AI powered speech therapist")
+    st.title("AI Powered Speech Therapist")
+
 # Task: Intro (maybe use card)
-st.text("-Alan, Henry, Willy")
-st.write("Lionel Logue is a AI powered digital speech therapist that helps stutterer becomes better at speaking.")
+st.text("made by Alan, Henry, Willy")
+st.write("This app is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
 
 # step 1
 with st.container():
@@ -171,8 +169,12 @@ with st.container():
   )
   with read:
     st.title("Read 📖")
-    st.markdown("In this section, please read the following paragraph so that we can compile which <u>phonemes</u> you struggle to pronounce.", unsafe_allow_html=True)
-    st.write(SAMPLE_PARAGRAPH)
+    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready.", unsafe_allow_html=True)
+    st.markdown("<strong>" + SAMPLE_PARAGRAPH + "</strong>", unsafe_allow_html=True)
+    read_clicked = st.button("Start Recording",
+      key = "read-button"
+    )
+    if read_clicked:
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
       # record()
@@ -218,7 +220,7 @@ with st.container():
   with read:
     st.title("Analyze 📋")
     st.write("Words you stuttered on:")
-    st.markdown(st.session_state.stuttered_text, unsafe_allow_html=True) # Task: underline words stuttered on
+    st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes) # Task: show phonemes
     analyze_clicked = st.button("Next",
@@ -234,7 +236,8 @@ with st.container():
   )
   with read:
     st.title("Practice 🎙")
-    st.write("We generated a sentense based on the phonemes you most often stuttered on. Practice using the following sentence to help you from stuttering!")
+    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. You can do it!")
+    st.markdown("<strong>" + st.session_state.paragraph + "</strong>", unsafe_allow_html=True)
     practice_clicked = st.button("Next",
       key = "practice-button"
     )
@@ -248,7 +251,6 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
-    st.write(st.session_state.paragraph)
 
 # Footer
 with st.container():
