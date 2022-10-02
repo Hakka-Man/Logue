@@ -55,6 +55,7 @@ def next(prev, curr):
   st.experimental_rerun()
 
 def substitute_paragraph(phoenemes):
+  phoenemes = phoenemes[0]
   # paragraph = labeledParagraphs[random.randint(0,4)]
   paragraph = labeledParagraphs[0]
   paragraph_text = ""
@@ -125,7 +126,7 @@ if 'stuttered_text' not in st.session_state:
   st.session_state.stuttered_text = SAMPLE_PARAGRAPH
 
 if 'phoenemes' not in st.session_state:
-  st.session_state.phoenemes = []
+  st.session_state.phoenemes = ["", 0]
 
 if 'paragraph' not in st.session_state:
   st.session_state.paragraph = ""
@@ -171,12 +172,9 @@ with st.container():
     st.title("Read 📖")
     st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready.", unsafe_allow_html=True)
     st.markdown("<strong>" + SAMPLE_PARAGRAPH + "</strong>", unsafe_allow_html=True)
-    read_clicked = st.button("Start Recording",
-      key = "read-button"
-    )
-      # optional task: can add countdown feature on button
-      # optional task: allow user to download the recorded audio
-      # record()
+    # optional task: can add countdown feature on button
+    # optional task: allow user to download the recorded audio
+    # record()
     val = st_audiorec()
     if isinstance(val, dict):
       with st.spinner('retrieving audio-recording...'):
@@ -221,7 +219,7 @@ with st.container():
     st.write("Words you stuttered on:")
     st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
-    st.text(st.session_state.phoenemes) # Task: show phonemes
+    st.text(st.session_state.phoenemes[0]) # Task: show phonemes
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
