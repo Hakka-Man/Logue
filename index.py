@@ -45,7 +45,8 @@ def next(prev, curr):
   st.experimental_rerun()
 
 def substitute_paragraph(phoenemes):
-  paragraph = labeledParagraphs[random.randint(0,4)]
+  # paragraph = labeledParagraphs[random.randint(0,4)]
+  paragraph = labeledParagraphs[1]
   paragraph_text = ""
   index = 0
   for word in paragraph:

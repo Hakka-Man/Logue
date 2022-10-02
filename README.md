@@ -10,3 +10,9 @@ Setup guide:
 
 3. Install Streamlit
    conda install streamlit
+   
+4. Install Phoenimizer
+   pip install phoenimzer
+   
+5. Install espeak
+   brew install espeak
