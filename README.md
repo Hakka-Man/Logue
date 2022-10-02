@@ -19,10 +19,13 @@ streamlit_lottie==0.0.3
 torch==1.12.1
 transformers==4.22.2
 
+2. Install conda dependencies using environment_droplet.yml
 
 
 3. Following installing the dependencies, run by executing 
-'''streamlit run index.py'''
+```
+streamlit run index.py
+```
 
 # Intro
 Stutters are roughly 1% of the world’s population, around 70 million people. Depending on the condition’s severity, stuttering can significantly hamper one’s ability to do presentations, talk to strangers, or even just chat with friends, leading to psychological and self-esteem issues. As a stutterer myself, I want to leverage the power of AI and NLP to provide support for the stutterer community. 
