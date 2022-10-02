@@ -82,13 +82,17 @@ def substitute_paragraph(phoenemes):
       
 
 def predict_stutter():
-  stuttered_phonemes = st.session_state.phoenemes
+  stuttered_phonemes = st.session_state.phoenemes[0]
   stuttered_phonemes_maps = {}
+  print(stuttered_phonemes)
   words = SAMPLE_PARAGRAPH.split()
+  print("hi")
+  print(words)
   processed_words = []
   for word in words:
     phonemesOfWord = ipa.convert(word)
     for phoneme in phonemesOfWord:
+      print(phoneme)
       if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
         break
@@ -242,7 +246,7 @@ with st.container():
     st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes[0]) # Task: show phonemes
-    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(st.session_state.phoenemes[1]))
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(int(st.session_state.phoenemes[1]*100)))
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -307,7 +311,7 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
-    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(st.session_state.phoenemes[1]))
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(int(st.session_state.phoenemes[1]*100)))
 
 
 # Footer
