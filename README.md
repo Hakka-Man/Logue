@@ -36,5 +36,6 @@ In the first step, the user would read and record a curated text that would allo
 
 After figuring out the weaknesses of the user, we would show that information to the user and generate a personalized practice text with Spacy NLP methods. The text would contain words with the phonemes that the user is struggling with. The sentences don’t have to mean anything semantically, but we made the text grammatically correct to make it a realistic practice material. The users would be able to practice and analyze their results with our program. 
 
-
+# Screenshots
+![Start](https://i.ibb.co/sFX1sd3/Screen-Shot-2022-10-02-at-10-46-44641.png)
 
