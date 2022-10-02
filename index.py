@@ -174,7 +174,6 @@ with st.container():
     read_clicked = st.button("Start Recording",
       key = "read-button"
     )
-    if read_clicked:
       # optional task: can add countdown feature on button
       # optional task: allow user to download the recorded audio
       # record()
