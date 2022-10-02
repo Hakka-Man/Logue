@@ -165,11 +165,12 @@ with st.container():
     st.write("")
     st.write("")
     st.write("")
-    st.title("AI Powered Speech Therapist")
+    st.title("Logue")
+    st.caption("AI Powered Speech Therapist")
 
 # Task: Intro (maybe use card)
 st.text("made by Alan, Henry, Willy")
-st.write("This app is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
+st.write("Logue is an AI powered digital speech therapist that helps stutterers become better at speaking in an intelligent way: with transformer AI models, phoneme detection, and NLP text generation.")
 
 # step 1
 with st.container():
@@ -241,7 +242,7 @@ with st.container():
     st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes[0]) # Task: show phonemes
-    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + st.session_state.phoenemes[1])
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(st.session_state.phoenemes[1]))
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -306,7 +307,7 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
-    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + st.session_state.phoenemes[1])
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(st.session_state.phoenemes[1]))
 
 
 # Footer
