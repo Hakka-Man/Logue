@@ -157,11 +157,12 @@ with st.container():
     st.write("")
     st.write("")
     st.write("")
-    st.title("AI Powered Speech Therapist")
+    st.title("Logue")
+    st.caption("AI Powered Speech Therapist")
 
 # Task: Intro (maybe use card)
 st.text("made by Alan, Henry, Willy")
-st.write("This app is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
+st.write("Logue is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
 
 # step 1
 with st.container():
