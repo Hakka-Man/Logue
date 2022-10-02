@@ -121,7 +121,7 @@ if 'phoenemes' not in st.session_state:
   st.session_state.phoenemes = []
 
 if 'paragraph' not in st.session_state:
-  st.session_state.paragraph = []
+  st.session_state.paragraph = ""
 
 st.write("""
 <style>
@@ -143,12 +143,11 @@ with st.container():
     st.write("")
     st.write("")
     st.write("")
-    st.title("Lionel Logue")
-    st.text("2022 AI powered speech therapist")
-    # st.caption("AI powered speech therapist")
+    st.title("AI Powered Speech Therapist")
+
 # Task: Intro (maybe use card)
-st.text("-Alan, Henry, Willy")
-st.write("Lionel Logue is a AI powered digital speech therapist that helps stutterer becomes better at speaking.")
+st.text("made by Alan, Henry, Willy")
+st.write("This app is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
 
 # step 1
 with st.container():
@@ -157,8 +156,8 @@ with st.container():
   )
   with read:
     st.title("Read 📖")
-    st.markdown("In this section, please read the following paragraph so that we can compile which <u>phonemes</u> you struggle to pronounce.", unsafe_allow_html=True)
-    st.write(SAMPLE_PARAGRAPH)
+    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready.", unsafe_allow_html=True)
+    st.markdown("<strong>" + SAMPLE_PARAGRAPH + "</strong>", unsafe_allow_html=True)
     read_clicked = st.button("Start Recording",
       key = "read-button"
     )
@@ -201,7 +200,8 @@ with st.container():
   )
   with read:
     st.title("Practice 🎙")
-    st.write("We generated a sentense based on the phonemes you most often stuttered on. Practice using the following sentence to help you from stuttering!")
+    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. You can do it!")
+    st.markdown("<strong>" + st.session_state.paragraph + "</strong>", unsafe_allow_html=True)
     practice_clicked = st.button("Next",
       key = "practice-button"
     )
@@ -215,7 +215,6 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
-    st.write(st.session_state.paragraph)
 
 # Footer
 with st.container():
