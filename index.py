@@ -14,6 +14,7 @@ import os
 from io import BytesIO
 import io
 import streamlit.components.v1 as components
+import librosa
 import ffmpeg
 
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -81,13 +82,17 @@ def substitute_paragraph(phoenemes):
       
 
 def predict_stutter():
-  stuttered_phonemes = st.session_state.phoenemes
+  stuttered_phonemes = st.session_state.phoenemes[0]
   stuttered_phonemes_maps = {}
+  print(stuttered_phonemes)
   words = SAMPLE_PARAGRAPH.split()
+  print("hi")
+  print(words)
   processed_words = []
   for word in words:
     phonemesOfWord = ipa.convert(word)
     for phoneme in phonemesOfWord:
+      print(phoneme)
       if phoneme in stuttered_phonemes:
         processed_words.append("<u>" + word + "</u>")
         break
@@ -102,6 +107,7 @@ SAMPLE_PARAGRAPH = """
 
 # time user has to read the sample paragraph
 SAMPLE_TIME = 60
+fs = 16000
 
 book_animation = load_lottieurl("https://assets7.lottiefiles.com/packages/lf20_4XmSkB.json")
 
@@ -131,11 +137,17 @@ if 'phoenemes' not in st.session_state:
 if 'paragraph' not in st.session_state:
   st.session_state.paragraph = ""
 
-if 'finish_record' not in st.session_state:
-  st.session_state.finish_record = False
+if 'finish_record_start' not in st.session_state:
+  st.session_state.finish_record_start = False
 
-if 'start_loading' not in st.session_state:
-  st.session_state.start_loading = False
+if 'start_loading_start' not in st.session_state:
+  st.session_state.start_loading_start = False
+
+if 'finish_record_prac' not in st.session_state:
+  st.session_state.finish_record_prac = False
+
+if 'start_loading_prac' not in st.session_state:
+  st.session_state.start_loading_prac = False
 
 st.write("""
 <style>
@@ -157,11 +169,12 @@ with st.container():
     st.write("")
     st.write("")
     st.write("")
-    st.title("AI Powered Speech Therapist")
+    st.title("Logue")
+    st.caption("AI Powered Speech Therapist")
 
 # Task: Intro (maybe use card)
 st.text("made by Alan, Henry, Willy")
-st.write("This app is an AI powered digital speech therapist that helps stutterer becomes better at speaking.")
+st.write("Logue is an AI powered digital speech therapist that helps stutterers become better at speaking in an intelligent way: with transformer AI models, phoneme detection, and NLP text generation.")
 
 # step 1
 with st.container():
@@ -170,12 +183,12 @@ with st.container():
   )
   with read:
     st.title("Read 📖")
-    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready.", unsafe_allow_html=True)
+    st.markdown("Hello! Welcome to the first step of the therapy. In this section, please read the following paragraph so that we can detect which <u>phonemes</u> you struggle to pronounce. The paragraph is designed to test all the phonemes, so it may not make semantic sense. Please relax and click the 'Start Recording' button and start speaking when you are ready. Click 'Stop' when you finish talking. Click 'Reset' if you want to start over. Click 'Download' if you want to hear what you said. Finally, click 'Submit' button to sumbit your sound file to our slutter phonemes detector.", unsafe_allow_html=True)
     st.markdown("<strong>" + SAMPLE_PARAGRAPH + "</strong>", unsafe_allow_html=True)
     # optional task: can add countdown feature on button
     # optional task: allow user to download the recorded audio
     # record()
-    val = st_audiorec()
+    val = st_audiorec(key="start-rec")
     if isinstance(val, dict):
       with st.spinner('retrieving audio-recording...'):
         ind, val = zip(*val['arr'].items())
@@ -187,17 +200,30 @@ with st.container():
       # st.audio(wav_bytes, format='audio/wav')
       data, samplerate = sf.read(io.BytesIO(wav_bytes))
       sf.write('stereo.flac', data, samplerate)
-      st.session_state.finish_record = True
 
-    if st.session_state.finish_record:
-      read_clicked = st.button("Next",
+      st.session_state.finish_record_start = True
+
+    if st.session_state.finish_record_start:
+      read_clicked = st.button("Submit",
         key = "next-button"
       )
       if read_clicked:
-        st.session_state.start_loading = True
-        if st.session_state.start_loading:
+        st.session_state.start_loading_start = True
+        if st.session_state.start_loading_start:
           st.caption("loading...")
         ffmpeg.input('stereo.flac').output('output.flac', ac=1).run(overwrite_output=True)
+
+        audio, sr = sf.read('output.flac')
+        sf.write('output.wav', audio, sr, 'PCM_16')
+
+        x, sr = librosa.load('output.wav', sr=48000)
+        y = librosa.resample(x, 48000, 16000)
+        sf.write('output.flac', y, 16000)
+        # librosa.output.write_wav("output.wav", y, sr=16000, norm=False)
+
+        # data, samplerate = sf.read('output.wav')
+        # sf.write('output.flac', data, samplerate)
+
         t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
         phoenemes = phodel.getPhonemes(t, t_s)
         print(phoenemes)
@@ -205,7 +231,7 @@ with st.container():
         paragraph = substitute_paragraph(phoenemes)
         st.session_state.paragraph = paragraph
         print(paragraph)
-        st.session_state.start_loading = False
+        st.session_state.start_loading_start = False
       # task: predict_stutter()
         next("read_expended", "analyze_expended")
 
@@ -220,6 +246,7 @@ with st.container():
     st.markdown(predict_stutter(), unsafe_allow_html=True) # Task: underline words stuttered on
     st.write("Phonemes you stuttered on:")
     st.text(st.session_state.phoenemes[0]) # Task: show phonemes
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(int(st.session_state.phoenemes[1]*100)))
     analyze_clicked = st.button("Next",
       key = "analyze-button"
     )
@@ -233,13 +260,49 @@ with st.container():
   )
   with read:
     st.title("Practice 🎙")
-    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. You can do it!")
+    st.write("Our AI generated a paragraph below based on the phonemes you stuttered on the most. The paragraph is designed to be a little diffcult for you to read because we reused phonemes you stuttered on the most when generating the paragraph. Practice reading out the paragraph will help you from stuttering. Click the 'Start Recording' button and start the practice when you are ready. Click 'Stop' when you finish talking. Click 'Reset' if you want to start over. Click 'Download' if you want to hear what you said. Finally, click 'Submit' button to sumbit your sound file to our slutter phonemes detector. You can do it!")
     st.markdown("<strong>" + st.session_state.paragraph + "</strong>", unsafe_allow_html=True)
-    practice_clicked = st.button("Next",
-      key = "practice-button"
-    )
-    if practice_clicked:
-      next("practice_expended", "result_expended")
+    
+    val = st_audiorec(key="prac-rec")
+    if isinstance(val, dict):
+      with st.spinner('retrieving audio-recording...'):
+        ind, val = zip(*val['arr'].items())
+        ind = np.array(ind, dtype=int)
+        val = np.array(val)
+        sorted_ints = val[ind]
+        stream = BytesIO(b"".join([int(v).to_bytes(1, "big") for v in sorted_ints]))
+        wav_bytes = stream.read()
+      # st.audio(wav_bytes, format='audio/wav')
+      data, samplerate = sf.read(io.BytesIO(wav_bytes))
+      sf.write('stereo.flac', data, samplerate)
+      st.session_state.finish_record_prac = True
+
+    if st.session_state.finish_record_prac:
+      practice_clicked = st.button("Submit",
+        key = "practice-button"
+      )
+      if practice_clicked:
+        st.session_state.start_loading_prac = True
+        if st.session_state.start_loading_prac:
+          st.caption("loading...")
+        ffmpeg.input('stereo.flac').output('output.flac', ac=1).run(overwrite_output=True)
+        t, t_s = phodel.getTranscription(SAMPLE_PARAGRAPH)
+        phoenemes = phodel.getPhonemes(t, t_s)
+        print(phoenemes)
+        st.session_state.phoenemes = phoenemes
+        paragraph = substitute_paragraph(phoenemes)
+        st.session_state.paragraph = paragraph
+        print(paragraph)
+        st.session_state.start_loading_prac = False
+      # task: predict_stutter()
+        next("practice_expended", "result_expended")
+    
+    
+    # practice_clicked = st.button("Next",
+    #   key = "practice-button"
+    # )
+    # if practice_clicked:
+    #   next("practice_expended", "result_expended")
   
 # result
 with st.container():
@@ -248,6 +311,8 @@ with st.container():
   )
   with read:
     st.title("Result 🤗")
+    st.write("Fluency score out of 100(The higher you get, the less you stuttered):" + str(int(st.session_state.phoenemes[1]*100)))
+
 
 # Footer
 # with st.container():
